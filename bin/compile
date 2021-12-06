@@ -1,0 +1,22 @@
+#!/bin/bash
+
+build_dir=$1
+cache_dir=$2
+env_dir=$3
+flutter_version="${FLUTTER_VERSION:-stable}"
+
+[ ! -d "$cache_dir/flutter" ] && git clone https://github.com/flutter/flutter.git -b "$flutter_version" --depth 1 "$cache_dir/flutter"
+
+export PATH="$PATH:$cache_dir/flutter/bin"
+
+cd $build_dir
+
+flutter pub get
+
+if [ -f "$build_dir/build_web.sh" ]; then
+  $build_dir/build_web.sh
+else
+  flutter build web --release
+fi
+
+cp -r "$build_dir/build/web" "$build_dir/export"
